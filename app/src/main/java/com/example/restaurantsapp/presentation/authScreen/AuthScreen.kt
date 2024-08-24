@@ -21,7 +21,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.restaurantsapp.navigation.Routes
 import com.example.restaurantsapp.navigation.getAuthScreenRoute
-import com.example.restaurantsapp.utils.Constants
 import com.example.restaurantsapp.utils.Utility
 
 @Composable
@@ -34,6 +33,10 @@ fun AuthScreen(
     ) -> Unit
 ) {
     val context = LocalContext.current
+
+    var name by rememberSaveable {
+        mutableStateOf("")
+    }
 
     var mobileNumber by rememberSaveable {
         mutableStateOf("")
@@ -50,8 +53,19 @@ fun AuthScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        if (screenType == ScreenType.SIGN_UP.name) {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(text = "Name") },
+                value = name,
+                onValueChange = { name = it }
+            )
+        }
+
         TextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .fillMaxWidth(),
             label = {
                 Text(text = "Mobile number")
             },
@@ -84,14 +98,14 @@ fun AuthScreen(
 
         Button(
             modifier = Modifier.padding(top = 32.dp),
-            enabled = pin.length == Constants.PIN_LENGTH,
+            enabled = viewModel.buttonEnabled(name, pin, screenType),
             onClick = {
                 if (screenType == ScreenType.LOGIN.name) {
                     viewModel.handleLogin(context, mobileNumber, pin) {
                         navigate(Routes.HOME_SCREEN,true)
                     }
                 } else {
-                    viewModel.registerUser(context, mobileNumber, pin) {
+                    viewModel.registerUser(context, name, mobileNumber, pin) {
                         navigate(getAuthScreenRoute(ScreenType.LOGIN),true)
                     }
                 }

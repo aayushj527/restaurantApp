@@ -30,7 +30,8 @@ class AuthScreenVM(private val appRepository: AppRepository): ViewModel() {
                 }
 
                 else -> {
-                    Constants.currentlyLoggedInUser = mobileNumber
+                    Constants.currentlyLoggedInUserNumber = user.mobileNumber
+                    Constants.currentlyLoggedInUserName = user.name
                     navigate()
                 }
             }
@@ -39,6 +40,7 @@ class AuthScreenVM(private val appRepository: AppRepository): ViewModel() {
 
     fun registerUser(
         context: Context,
+        name: String,
         mobileNumber: String,
         pin: String,
         navigate: () -> Unit
@@ -47,11 +49,16 @@ class AuthScreenVM(private val appRepository: AppRepository): ViewModel() {
             val user = appRepository.getUser(mobileNumber)
 
             if (user == null) {
-                appRepository.register(UserEntity(mobileNumber, pin))
+                appRepository.register(UserEntity(mobileNumber, name, pin))
                 navigate()
             } else {
                 Toast.makeText(context, "User already registered", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    fun buttonEnabled(name: String, pin: String, screenType: String?): Boolean {
+        return (pin.length == Constants.PIN_LENGTH) &&
+                (name.trim().isNotEmpty() || screenType == ScreenType.LOGIN.name)
     }
 }

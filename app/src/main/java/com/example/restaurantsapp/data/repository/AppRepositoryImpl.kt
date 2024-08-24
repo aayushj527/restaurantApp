@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.restaurantsapp.data.local.AppDao
+import com.example.restaurantsapp.data.local.entity.ReviewEntity
 import com.example.restaurantsapp.data.local.entity.UserEntity
 import com.example.restaurantsapp.data.remote.api.ApiConstants
 import com.example.restaurantsapp.data.remote.api.Restaurant
@@ -11,19 +12,25 @@ import com.example.restaurantsapp.data.remote.api.RestaurantRemoteSource
 import com.example.restaurantsapp.data.remote.paging.RestaurantPagingSource
 import com.example.restaurantsapp.domain.repository.AppRepository
 import com.example.restaurantsapp.utils.Constants
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 
 class AppRepositoryImpl(
     private val dao: AppDao,
     private val restaurantRemoteSource: RestaurantRemoteSource
-): AppRepository {
+) : AppRepository {
 
     override suspend fun getUser(mobileNumber: String): UserEntity? {
-        return dao.getUser(mobileNumber)
+        return withContext(Dispatchers.IO) {
+            dao.getUser(mobileNumber)
+        }
     }
 
     override suspend fun register(userEntity: UserEntity) {
-        dao.register(userEntity)
+        withContext(Dispatchers.IO) {
+            dao.register(userEntity)
+        }
     }
 
     override suspend fun getRestaurants(): Flow<PagingData<Restaurant>> {
@@ -36,19 +43,36 @@ class AppRepositoryImpl(
     }
 
     override suspend fun rejectRestaurant(fsqId: String) {
-        val rejectedRestaurants = dao
-            .getUser(Constants.currentlyLoggedInUser)
-            ?.rejectedRestaurants
-            ?.apply {
-                if (!contains(fsqId)) {
-                    add(fsqId)
-                }
-            } ?: arrayListOf(fsqId)
+        withContext(Dispatchers.IO) {
+            val rejectedRestaurants = dao
+                .getUser(Constants.currentlyLoggedInUserNumber)
+                ?.rejectedRestaurants
+                ?.apply {
+                    if (!contains(fsqId)) {
+                        add(fsqId)
+                    }
+                } ?: arrayListOf(fsqId)
 
-        dao.updateRejectedRestaurants(Constants.currentlyLoggedInUser, rejectedRestaurants)
+            dao.updateRejectedRestaurants(
+                Constants.currentlyLoggedInUserNumber,
+                rejectedRestaurants
+            )
+        }
     }
 
     override suspend fun getRejectRestaurants(): ArrayList<String>? {
-        return dao.getUser(Constants.currentlyLoggedInUser)?.rejectedRestaurants
+        return withContext(Dispatchers.IO) {
+            dao.getUser(Constants.currentlyLoggedInUserNumber)?.rejectedRestaurants
+        }
+    }
+
+    override fun getReviews(): Flow<List<ReviewEntity>> {
+        return dao.getReviews()
+    }
+
+    override suspend fun updateReviews(fsqId: String, reviews: HashMap<String, String>) {
+        withContext(Dispatchers.IO) {
+            dao.updateReviews(ReviewEntity(fsqId, reviews))
+        }
     }
 }
