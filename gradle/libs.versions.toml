@@ -15,6 +15,7 @@ retrofit = "2.9.0"
 convertorGson = "2.9.0"
 ksp = "1.9.23-1.0.20"
 navigation = "2.7.7"
+paging = "3.3.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -38,6 +39,8 @@ koin = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 gson-convertor = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "convertorGson" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
+paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.restaurantsapp.navigation.Routes
+import com.example.restaurantsapp.navigation.getAuthScreenRoute
 import com.example.restaurantsapp.utils.Constants
 import com.example.restaurantsapp.utils.Utility
 
@@ -26,7 +28,10 @@ import com.example.restaurantsapp.utils.Utility
 fun AuthScreen(
     viewModel: AuthScreenVM,
     screenType: String?,
-    navigate: (String) -> Unit
+    navigate: (
+        route: String,
+        popCurrentScreen: Boolean
+    ) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -82,9 +87,13 @@ fun AuthScreen(
             enabled = pin.length == Constants.PIN_LENGTH,
             onClick = {
                 if (screenType == ScreenType.LOGIN.name) {
-                    viewModel.handleLogin(context, mobileNumber, pin, navigate)
+                    viewModel.handleLogin(context, mobileNumber, pin) {
+                        navigate(Routes.HOME_SCREEN,true)
+                    }
                 } else {
-//                    viewModel.
+                    viewModel.registerUser(context, mobileNumber, pin) {
+                        navigate(getAuthScreenRoute(ScreenType.LOGIN),true)
+                    }
                 }
             }
         ) {

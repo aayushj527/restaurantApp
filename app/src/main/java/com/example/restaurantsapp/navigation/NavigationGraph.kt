@@ -1,16 +1,15 @@
 package com.example.restaurantsapp.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.restaurantsapp.presentation.authScreen.AuthScreen
 import com.example.restaurantsapp.presentation.authScreen.AuthScreenVM
-import com.example.restaurantsapp.presentation.authScreen.ScreenType
+import com.example.restaurantsapp.presentation.homeScreen.HomeScreen
+import com.example.restaurantsapp.presentation.homeScreen.HomeScreenVM
 import com.example.restaurantsapp.presentation.landingScreen.LandingScreen
 import org.koin.java.KoinJavaComponent.get
-import org.koin.java.KoinJavaComponent.inject
 
 @Composable
 fun RestaurantsNavHost() {
@@ -18,27 +17,32 @@ fun RestaurantsNavHost() {
 
     NavHost(
         navController = navController,
-        startDestination = "landing_screen"
+        startDestination = Routes.LANDING_SCREEN
     ) {
-        composable("landing_screen") {
+        composable(Routes.LANDING_SCREEN) {
             LandingScreen { route ->
                 navController.navigate(route)
             }
         }
 
-        composable("auth_screen?screenType={screenType}") {
+        composable(Routes.AUTH_SCREEN) {
             val viewModel: AuthScreenVM = get(AuthScreenVM::class.java)
 
             AuthScreen(
                 viewModel = viewModel,
                 screenType = it.arguments?.getString("screenType")
-            ) { route ->
-                navController.navigate(route)
+            ) { route, popCurrentScreen ->
+                navController.navigate(route) {
+                    if (popCurrentScreen) {
+                        popUpTo(0)
+                    }
+                }
             }
         }
 
-        composable("home_screen") {
-
+        composable(Routes.HOME_SCREEN) {
+            val viewModel: HomeScreenVM = get(HomeScreenVM::class.java)
+            HomeScreen(viewModel = viewModel)
         }
     }
 }

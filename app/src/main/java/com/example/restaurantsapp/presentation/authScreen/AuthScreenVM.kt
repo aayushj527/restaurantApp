@@ -4,7 +4,9 @@ import android.content.Context
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.restaurantsapp.data.local.entity.UserEntity
 import com.example.restaurantsapp.domain.repository.AppRepository
+import com.example.restaurantsapp.utils.Constants
 import kotlinx.coroutines.launch
 
 class AuthScreenVM(private val appRepository: AppRepository): ViewModel() {
@@ -13,7 +15,7 @@ class AuthScreenVM(private val appRepository: AppRepository): ViewModel() {
         context: Context,
         mobileNumber: String,
         pin: String,
-        navigate: (String) -> Unit
+        navigate: () -> Unit
     ) {
         viewModelScope.launch {
             val user = appRepository.getUser(mobileNumber)
@@ -28,8 +30,27 @@ class AuthScreenVM(private val appRepository: AppRepository): ViewModel() {
                 }
 
                 else -> {
-                    navigate("")
+                    Constants.currentlyLoggedInUser = mobileNumber
+                    navigate()
                 }
+            }
+        }
+    }
+
+    fun registerUser(
+        context: Context,
+        mobileNumber: String,
+        pin: String,
+        navigate: () -> Unit
+    ) {
+        viewModelScope.launch {
+            val user = appRepository.getUser(mobileNumber)
+
+            if (user == null) {
+                appRepository.register(UserEntity(mobileNumber, pin))
+                navigate()
+            } else {
+                Toast.makeText(context, "User already registered", Toast.LENGTH_SHORT).show()
             }
         }
     }

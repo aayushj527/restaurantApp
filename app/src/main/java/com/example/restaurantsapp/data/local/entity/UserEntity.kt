@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class UserEntity(
     @PrimaryKey(false)
     var mobileNumber: String,
-    var pin: String
+    var pin: String,
+    var rejectedRestaurants: ArrayList<String>? = null
 )

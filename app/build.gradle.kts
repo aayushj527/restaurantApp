@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.ksp)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -19,6 +20,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("String","API_KEY", project.properties["API_KEY"].toString())
     }
 
     buildTypes {
@@ -39,6 +42,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.11"
@@ -75,4 +79,10 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.gson.convertor)
     implementation(libs.navigation.compose)
+
+    /**
+     *  Paging dependencies.
+     */
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
 }
